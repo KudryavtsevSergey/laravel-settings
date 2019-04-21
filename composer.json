@@ -1,0 +1,10 @@
+{
+    "name": "sun/settings",
+    "authors": [
+        {
+            "name": "Kudryavtsev Sergey",
+            "email": "invaderman@mail.ru"
+        }
+    ],
+    "require": {}
+}
