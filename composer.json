@@ -1,10 +1,30 @@
 {
     "name": "sun/settings",
+    "description": "Store settings in database",
     "authors": [
         {
             "name": "Kudryavtsev Sergey",
             "email": "invaderman@mail.ru"
         }
     ],
-    "require": {}
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
+        "psr-4": {
+            "Sun\\Settings\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Sun\\Settings\\SettingServiceProvider"
+            ],
+            "aliases": {
+                "Setting": "Sun\\Settings\\Facade"
+            }
+        }
+    }
 }
