@@ -35,7 +35,7 @@ class Setting extends BaseLocaleModel implements SettingStorageContract
         $this->joinName($query);
     }
 
-    public function retrieve(string $key)
+    public function retrieve(string $key): ?array
     {
         $setting = static::select('setting.key', 'setting.value', 'setting_locale.value as locale_value')
             ->where('key', $key)
@@ -43,7 +43,7 @@ class Setting extends BaseLocaleModel implements SettingStorageContract
             ->first();
 
         if (is_null($setting)) {
-            return $setting;
+            return null;
         }
 
         $setting = $setting->toArray();
@@ -54,6 +54,13 @@ class Setting extends BaseLocaleModel implements SettingStorageContract
         return $setting;
     }
 
+    /**
+     * @param string $key
+     * @param $value
+     * @param $localeValue
+     * @return array|mixed|null
+     * @throws \Exception
+     */
     public function store(string $key, $value, $localeValue)
     {
         $value = is_null($value) ? $value : json_encode($value);

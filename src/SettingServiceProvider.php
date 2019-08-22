@@ -15,9 +15,11 @@ class SettingServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
         $this->publishes([
-            __DIR__ . '/config/config.php' => config_path('settings.php')
-        ], 'config');
+            __DIR__ . '/../config/settings.php' => config_path('settings.php')
+        ], 'settings');
     }
 
     /**
@@ -27,7 +29,9 @@ class SettingServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('Setting', Setting::class);
+        $this->mergeConfigFrom(__DIR__ . '/../config/settings.php', 'settings');
+
+        $this->app->singleton('Setting', Setting::class);
         $this->app->bind(SettingStorageContract::class, SettingStorage::class);
     }
 }
