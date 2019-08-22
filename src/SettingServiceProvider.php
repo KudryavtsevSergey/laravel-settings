@@ -29,6 +29,9 @@ class SettingServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        //Sun\Locale\LocaleServiceProvider::class
+
+
         $this->mergeConfigFrom(__DIR__ . '/../config/settings.php', 'settings');
 
         $this->app->singleton('Setting', Setting::class);

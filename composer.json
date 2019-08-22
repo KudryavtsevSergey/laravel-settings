@@ -8,7 +8,9 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "sun/locale": "dev-master"
+    },
     "autoload": {
         "files": [
             "src/helpers.php"
