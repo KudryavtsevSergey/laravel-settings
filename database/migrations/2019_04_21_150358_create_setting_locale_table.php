@@ -19,4 +19,9 @@ class CreateSettingLocaleTable extends LocaleMigration
     {
         $table->text('value');
     }
+
+    protected function addForeignField(Blueprint $table, string $keyName)
+    {
+        $table->string($keyName, 255);
+    }
 }
