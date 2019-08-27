@@ -5,7 +5,7 @@ namespace Sun\Settings\SettingStorages;
 use Illuminate\Support\Collection;
 use Sun\Settings\Models\Setting;
 
-class EloquentSettingStorage implements SettingStorageContract
+class EloquentSettingStorage extends SettingStorage
 {
     /**
      * @var Setting
@@ -53,11 +53,6 @@ class EloquentSettingStorage implements SettingStorageContract
             ->settingLocale()
             ->get();
 
-        return $settings->keyBy('key')->transform(function ($setting) {
-            $value = !empty($setting['value']) ? json_decode($setting['value'], true) : $setting['value'];
-            $localeValue = !empty($setting['locale_value']) ? json_decode($setting['locale_value'], true) : $setting['locale_value'];
-
-            return ['value' => $value, 'locale_value' => $localeValue];
-        });
+        return $this->encodeCollection($settings);
     }
 }

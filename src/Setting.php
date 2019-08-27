@@ -4,7 +4,7 @@ namespace Sun\Settings;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
-use Sun\Settings\SettingStorages\SettingStorageContract;
+use Sun\Settings\SettingStorages\SettingStorage;
 
 /**
  * Class Setting
@@ -13,7 +13,7 @@ use Sun\Settings\SettingStorages\SettingStorageContract;
 class Setting
 {
     /**
-     * @var SettingStorageContract
+     * @var SettingStorage
      */
     protected $storage;
     /**
@@ -21,7 +21,7 @@ class Setting
      */
     protected $cache;
 
-    public function __construct(SettingStorageContract $storage, Repository $cache)
+    public function __construct(SettingStorage $storage, Repository $cache)
     {
         $this->storage = $storage;
         $this->cache = $cache;

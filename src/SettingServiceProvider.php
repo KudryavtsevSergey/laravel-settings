@@ -4,7 +4,7 @@ namespace Sun\Settings;
 
 use Illuminate\Support\ServiceProvider;
 use Sun\Settings\SettingStorages\DBSettingStorage;
-use Sun\Settings\SettingStorages\SettingStorageContract;
+use Sun\Settings\SettingStorages\SettingStorage;
 use Sun\Settings\SettingStorages\EloquentSettingStorage;
 
 class SettingServiceProvider extends ServiceProvider
@@ -38,10 +38,10 @@ class SettingServiceProvider extends ServiceProvider
 
         switch (config('settings.storage')) {
             case 'eloquent':
-                $this->app->bind(SettingStorageContract::class, EloquentSettingStorage::class);
+                $this->app->bind(SettingStorage::class, EloquentSettingStorage::class);
                 break;
             case 'db':
-                $this->app->bind(SettingStorageContract::class, DBSettingStorage::class);
+                $this->app->bind(SettingStorage::class, DBSettingStorage::class);
                 break;
         }
     }

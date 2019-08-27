@@ -8,7 +8,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 use Sun\Locale\Locale;
 
-class DBSettingStorage implements SettingStorageContract
+class DBSettingStorage extends SettingStorage
 {
     /**
      * @var Builder
@@ -70,6 +70,15 @@ class DBSettingStorage implements SettingStorageContract
 
     public function retrieveAll(): Collection
     {
-        // TODO: Implement retrieveAll() method.
+        $relatedTableName = "setting{$this->locale->tablePostfix()}";
+
+        $settings = $this->setting->select('setting.value', "{$relatedTableName}.value as locale_value")
+            ->join($relatedTableName, function (JoinClause $join) use ($relatedTableName) {
+                $join->on("{$relatedTableName}.setting_key", '=', "setting.key")
+                    ->where("{$relatedTableName}.{$this->locale->foreignColumnName()}", '=', $this->locale->getLocale());
+            })
+            ->get();
+
+        return $this->encodeCollection($settings);
     }
 }

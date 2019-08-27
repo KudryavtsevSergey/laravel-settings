@@ -4,7 +4,6 @@ namespace Sun\Settings\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Sun\Locale\Models\BaseModel;
 
 /**
