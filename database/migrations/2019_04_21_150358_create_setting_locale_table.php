@@ -7,7 +7,7 @@ class CreateSettingLocaleTable extends LocaleMigration
 {
     protected function getTableName(): string
     {
-        return 'setting';
+        return config('settings.table');
     }
 
     protected function getTablePrimaryKeyName(): string
@@ -17,7 +17,7 @@ class CreateSettingLocaleTable extends LocaleMigration
 
     protected function getLocaleTableFields(Blueprint $table)
     {
-        $table->text('value');
+        $table->text('value')->nullable();
     }
 
     protected function addForeignField(Blueprint $table, string $keyName)

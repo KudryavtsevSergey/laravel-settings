@@ -3,7 +3,6 @@
 namespace Sun\Settings\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Setting;
 use Sun\Settings\Http\Requests\SettingRequest;
 
@@ -28,10 +27,20 @@ class SettingApiController extends Controller
     public function set(SettingRequest $request, string $key)
     {
         $value = $request->input('value', null);
-        $localeValue = $request->input('locale_value', null);
 
-        Setting::setWithLocale($key, $value, $localeValue);
+        Setting::setValue($key, $value);
 
+        //TODO: localize
         return response()->json(['message' => 'Setting set.']);
+    }
+
+    public function setLocale(SettingRequest $request, string $key)
+    {
+        $value = $request->input('value', null);
+
+        Setting::setLocaleValue($key, $value);
+
+        //TODO: localize
+        return response()->json(['message' => 'Setting locale set.']);
     }
 }

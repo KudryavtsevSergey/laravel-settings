@@ -3,8 +3,9 @@
 namespace Sun\Settings;
 
 use Illuminate\Support\ServiceProvider;
-use Sun\Settings\Contracts\SettingStorageContract;
-use Sun\Settings\Models\Setting as SettingStorage;
+use Sun\Settings\SettingStorages\DBSettingStorage;
+use Sun\Settings\SettingStorages\SettingStorageContract;
+use Sun\Settings\SettingStorages\EloquentSettingStorage;
 
 class SettingServiceProvider extends ServiceProvider
 {
@@ -19,7 +20,9 @@ class SettingServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__ . '/../config/settings.php' => config_path('settings.php')
-        ], 'settings');
+        ], 'settings-config');
+
+        $this->loadRoutesFrom(__DIR__ . '/../routes/locale.php');
     }
 
     /**
@@ -29,12 +32,17 @@ class SettingServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //\Sun\Locale\LocaleServiceProvider::class
-
-
         $this->mergeConfigFrom(__DIR__ . '/../config/settings.php', 'settings');
 
         $this->app->singleton('Setting', Setting::class);
-        $this->app->bind(SettingStorageContract::class, SettingStorage::class);
+
+        switch (config('settings.storage')) {
+            case 'eloquent':
+                $this->app->bind(SettingStorageContract::class, EloquentSettingStorage::class);
+                break;
+            case 'db':
+                $this->app->bind(SettingStorageContract::class, DBSettingStorage::class);
+                break;
+        }
     }
 }

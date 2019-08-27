@@ -1,11 +1,10 @@
 <?php
 
-
 namespace Sun\Settings;
 
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Support\Facades\App;
-use Sun\Settings\Contracts\SettingStorageContract;
+use Illuminate\Support\Collection;
+use Sun\Settings\SettingStorages\SettingStorageContract;
 
 /**
  * Class Setting
@@ -28,53 +27,138 @@ class Setting
         $this->cache = $cache;
     }
 
-    protected function cacheHas(string $key)
+    private function cacheHas(string $key): bool
     {
         return $this->cache->has($key);
     }
 
-    protected function getFromCache(string $key)
+    private function getFromCache(string $key): array
     {
         return $this->cache->get($key);
     }
 
-    protected function addToCache(string $key, $value)
+    private function deleteFromCache(string $key)
     {
-        $this->cache->add($key, $value, 1);
+        $this->cache->delete($key);
     }
 
-    protected function getByKey(string $key)
+    private function addToCache(string $key, $value)
     {
-        /*if ($this->cacheHas($key)) {
-            $setting = $this->getFromCache($key);
-        } else {*/
-        $setting = $this->storage->retrieve($key);
+        $this->cache->add($key, $value, config('settings.cache_time'));
+    }
 
-        /*    $this->addToCache($key, $setting);
-        }*/
+    private function replaceInCache(string $key, $value = null)
+    {
+        if (is_null($value)) {
+            $this->deleteFromCache($key);
+        } else {
+            $this->addToCache($key, $value);
+        }
+    }
+
+    private function getByKey(string $key): ?array
+    {
+        $cacheKey = $this->getCacheDetailKey($key);
+
+        if ($this->cacheHas($cacheKey)) {
+            $setting = $this->getFromCache($cacheKey);
+        } else {
+            $setting = $this->storage->retrieve($key);
+
+            $this->addToCache($cacheKey, $setting);
+        }
         return $setting;
     }
 
-    public function get($key, $defaultValue)
+    private function getCacheDetailKey(string $key): string
     {
+        return "detail_{$key}";
+    }
+
+    private function getCacheListKey(): string
+    {
+        return "all_settings_unique_cache_key";
+    }
+
+    public function get($key, $defaultValue = null)
+    {
+        $defaultValue = $defaultValue ?? config("settings.default_values.{$key}");
+
         $setting = $this->getWithLocale($key);
 
         return $setting['locale_value'] ?: $setting['value'] ?: $defaultValue;
     }
 
-    public function getWithLocale($key)
+    public function getWithLocale($key): array
     {
-        $setting = $this->getByKey($key) ?: [
-            'key' => $key,
-            'value' => null,
-            'locale_value' => null,
-        ];
+        $setting = $this->getByKey($key) ?? [
+                'key' => $key,
+                'value' => null,
+                'locale_value' => null,
+            ];
 
         return $setting;
     }
 
-    public function setWithLocale($key, $value, $localeValue)
+    public function setValue(string $key, $value = null)
     {
-        $setting = $this->storage->store($key, $value, $localeValue);
+        $this->set($key, $value);
+    }
+
+    public function setLocaleValue(string $key, $value = null)
+    {
+        $this->set($key, $value, true);
+    }
+
+    public function set(string $key, $value = null, $locale = false)
+    {
+        $setting = $this->storage->store($key, $value, $locale);
+
+        $cacheKey = $this->getCacheDetailKey($key);
+        $this->deleteFromCache($cacheKey);
+        $this->deleteFromCache($this->getCacheListKey());
+    }
+
+    public function getAll(): Collection
+    {
+        $cacheKey = $this->getCacheListKey();
+
+        if ($this->cacheHas($cacheKey)) {
+            $settings = $this->getFromCache($cacheKey);
+        } else {
+            $settings = $this->storage->retrieveAll();
+
+            $settings = $this->getCollectionValues($settings);
+
+            $this->addToCache($cacheKey, $settings);
+        }
+
+        return $settings;
+    }
+
+    public function getByKeys(array $keys): Collection
+    {
+        $settings = $this->getAll();
+
+        $flippedKeys = collect($keys)->flip();
+
+        $flippedKeys->transform(function () {
+            return null;
+        });
+
+        $filteredSettings = $settings->filter(function ($setting, $key) use ($keys) {
+            return in_array($key, $keys);
+        });
+
+        return $flippedKeys->merge($filteredSettings);
+    }
+
+    private function getCollectionValues(Collection $items): Collection
+    {
+        $defaultValues = config('settings.default_values');
+
+        return $items->map(function (array $setting, $key) use ($defaultValues) {
+            return $setting['locale_value'] ?: $setting['value'] ?: $defaultValues[$key];
+        });
     }
 }

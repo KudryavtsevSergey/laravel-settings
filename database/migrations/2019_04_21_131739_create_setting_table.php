@@ -13,7 +13,7 @@ class CreateSettingTable extends Migration
      */
     public function up()
     {
-        Schema::create('setting', function (Blueprint $table) {
+        Schema::create(config('settings.table'), function (Blueprint $table) {
             $table->string('key')->primary();
             $table->text('value')->nullable();
             $table->timestamps();
@@ -27,6 +27,6 @@ class CreateSettingTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('setting');
+        Schema::dropIfExists(config('settings.table'));
     }
 }

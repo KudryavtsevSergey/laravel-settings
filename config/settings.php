@@ -1,8 +1,13 @@
 <?php
 
 return [
+    /**
+     * storage available: db, eloquent
+     */
+    'storage' => 'db',
     'table' => 'setting',
-    'keyColumn' => 'key',
-    'localeColumn' => 'locale_code',
-    'valueColumn' => 'value'
+    'cache_time' => 2 * 60 * 60,
+    'default_values' => [
+
+    ]
 ];
