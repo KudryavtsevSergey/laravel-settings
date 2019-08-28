@@ -22,7 +22,7 @@ class SettingServiceProvider extends ServiceProvider
             __DIR__ . '/../config/settings.php' => config_path('settings.php')
         ], 'settings-config');
 
-        $this->loadRoutesFrom(__DIR__ . '/../routes/locale.php');
+        $this->loadRoutesFrom(__DIR__ . '/../routes/settings.php');
     }
 
     /**
