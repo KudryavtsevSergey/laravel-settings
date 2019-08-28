@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Sun\Settings\SettingConfig;
 
 class CreateSettingTable extends Migration
 {
@@ -13,7 +14,7 @@ class CreateSettingTable extends Migration
      */
     public function up()
     {
-        Schema::create(config('settings.table'), function (Blueprint $table) {
+        Schema::create(SettingConfig::tableName(), function (Blueprint $table) {
             $table->string('key')->primary();
             $table->text('value')->nullable();
             $table->timestamps();
@@ -27,6 +28,6 @@ class CreateSettingTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(config('settings.table'));
+        Schema::dropIfExists(SettingConfig::tableName());
     }
 }

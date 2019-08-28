@@ -5,6 +5,7 @@ namespace Sun\Settings\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Sun\Locale\Models\BaseModel;
+use Sun\Settings\SettingConfig;
 
 /**
  * Class Setting
@@ -20,9 +21,14 @@ use Sun\Locale\Models\BaseModel;
  */
 class Setting extends BaseModel
 {
-    protected $table = 'setting';
     protected $primaryKey = 'key';
     public $incrementing = false;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->table = SettingConfig::tableName();
+    }
 
     protected $fillable = [
         'key',

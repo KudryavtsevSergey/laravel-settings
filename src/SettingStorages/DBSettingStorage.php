@@ -6,7 +6,8 @@ use DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
-use Sun\Locale\Locale;
+use Sun\Locale\LocaleConfig;
+use Sun\Settings\SettingConfig;
 
 class DBSettingStorage extends SettingStorage
 {
@@ -15,25 +16,20 @@ class DBSettingStorage extends SettingStorage
      */
     protected $setting;
 
-    /**
-     * @var Locale
-     */
-    protected $locale;
-
-    public function __construct(Locale $locale)
+    public function __construct()
     {
-        $this->setting = DB::table('setting');
-        $this->locale = $locale;
+        $this->setting = DB::table(SettingConfig::tableName());
     }
 
     public function retrieve(string $key): ?array
     {
-        $relatedTableName = "setting{$this->locale->tablePostfix()}";
+        $tableName = SettingConfig::tableName();
+        $relatedTableName = SettingConfig::relatedTableName();
 
-        $setting = $this->setting->select('setting.value', "{$relatedTableName}.value as locale_value")
-            ->join($relatedTableName, function (JoinClause $join) use ($relatedTableName) {
-                $join->on("{$relatedTableName}.setting_key", '=', "setting.key")
-                    ->where("{$relatedTableName}.{$this->locale->foreignColumnName()}", '=', $this->locale->getLocale());
+        $setting = $this->setting->select("{$tableName}.value", "{$relatedTableName}.value as locale_value")
+            ->leftJoin($relatedTableName, function (JoinClause $join) use ($tableName, $relatedTableName) {
+                $join->on("{$relatedTableName}.setting_key", '=', "{$tableName}.key")
+                    ->where($relatedTableName . LocaleConfig::foreignColumnName(), '=', LocaleConfig::getLocale());
             })
             ->where('key', '=', $key)
             ->first();
@@ -57,10 +53,10 @@ class DBSettingStorage extends SettingStorage
         if ($locale) {
             $this->setting->updateOrInsert(['key' => $key]);
 
-            $relatedTableName = "setting{$this->locale->tablePostfix()}";
+            $relatedTableName = SettingConfig::relatedTableName();
 
             DB::table($relatedTableName)->updateOrInsert([
-                $this->locale->foreignColumnName() => $this->locale->getLocale(),
+                LocaleConfig::foreignColumnName() => LocaleConfig::getLocale(),
                 'setting_key' => $key,
             ], ['value' => $value]);
         } else {
@@ -70,12 +66,13 @@ class DBSettingStorage extends SettingStorage
 
     public function retrieveAll(): Collection
     {
-        $relatedTableName = "setting{$this->locale->tablePostfix()}";
+        $tableName = SettingConfig::tableName();
+        $relatedTableName = SettingConfig::relatedTableName();
 
-        $settings = $this->setting->select('setting.value', "{$relatedTableName}.value as locale_value")
-            ->join($relatedTableName, function (JoinClause $join) use ($relatedTableName) {
-                $join->on("{$relatedTableName}.setting_key", '=', "setting.key")
-                    ->where("{$relatedTableName}.{$this->locale->foreignColumnName()}", '=', $this->locale->getLocale());
+        $settings = $this->setting->select("{$tableName}.value", "{$relatedTableName}.value as locale_value")
+            ->leftJoin($relatedTableName, function (JoinClause $join) use ($tableName, $relatedTableName) {
+                $join->on("{$relatedTableName}.setting_key", '=', "{$tableName}.key")
+                    ->where($relatedTableName . LocaleConfig::foreignColumnName(), '=', LocaleConfig::getLocale());
             })
             ->get();
 

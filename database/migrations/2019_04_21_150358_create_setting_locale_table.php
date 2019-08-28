@@ -2,12 +2,13 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Sun\Locale\Migrations\LocaleMigration;
+use Sun\Settings\SettingConfig;
 
 class CreateSettingLocaleTable extends LocaleMigration
 {
     protected function getTableName(): string
     {
-        return config('settings.table');
+        return SettingConfig::tableName();
     }
 
     protected function getTablePrimaryKeyName(): string

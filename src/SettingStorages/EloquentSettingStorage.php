@@ -4,6 +4,7 @@ namespace Sun\Settings\SettingStorages;
 
 use Illuminate\Support\Collection;
 use Sun\Settings\Models\Setting;
+use Sun\Settings\SettingConfig;
 
 class EloquentSettingStorage extends SettingStorage
 {
@@ -19,7 +20,10 @@ class EloquentSettingStorage extends SettingStorage
 
     public function retrieve(string $key): ?array
     {
-        $setting = $this->setting->select('setting.key', 'setting.value', 'setting_locale.value as locale_value')
+        $tableName = SettingConfig::tableName();
+        $relatedTableName = SettingConfig::relatedTableName();
+
+        $setting = $this->setting->select("{$tableName}.key", "{$tableName}.value", "{$relatedTableName}.value as locale_value")
             ->settingLocale()
             ->find($key);
 
@@ -49,7 +53,10 @@ class EloquentSettingStorage extends SettingStorage
 
     public function retrieveAll(): Collection
     {
-        $settings = $this->setting->select('setting.key', 'setting.value', 'setting_locale.value as locale_value')
+        $tableName = SettingConfig::tableName();
+        $relatedTableName = SettingConfig::relatedTableName();
+
+        $settings = $this->setting->select("{$tableName}.key", "{$tableName}.value", "{$relatedTableName}.value as locale_value")
             ->settingLocale()
             ->get();
 
