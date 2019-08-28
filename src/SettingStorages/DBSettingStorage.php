@@ -29,7 +29,7 @@ class DBSettingStorage extends SettingStorage
         $setting = $this->setting->select("{$tableName}.value", "{$relatedTableName}.value as locale_value")
             ->leftJoin($relatedTableName, function (JoinClause $join) use ($tableName, $relatedTableName) {
                 $join->on("{$relatedTableName}.setting_key", '=', "{$tableName}.key")
-                    ->where($relatedTableName . LocaleConfig::foreignColumnName(), '=', LocaleConfig::getLocale());
+                    ->where($relatedTableName . '.' . LocaleConfig::foreignColumnName(), '=', LocaleConfig::getLocale());
             })
             ->where('key', '=', $key)
             ->first();
@@ -72,7 +72,7 @@ class DBSettingStorage extends SettingStorage
         $settings = $this->setting->select("{$tableName}.value", "{$relatedTableName}.value as locale_value")
             ->leftJoin($relatedTableName, function (JoinClause $join) use ($tableName, $relatedTableName) {
                 $join->on("{$relatedTableName}.setting_key", '=', "{$tableName}.key")
-                    ->where($relatedTableName . LocaleConfig::foreignColumnName(), '=', LocaleConfig::getLocale());
+                    ->where($relatedTableName . '.' . LocaleConfig::foreignColumnName(), '=', LocaleConfig::getLocale());
             })
             ->get();
 
