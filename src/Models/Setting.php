@@ -4,7 +4,7 @@ namespace Sun\Settings\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Sun\Locale\Models\BaseModel;
+use Sun\Locale\Models\AbstractLocaleModel;
 use Sun\Settings\SettingConfig;
 
 /**
@@ -19,7 +19,7 @@ use Sun\Settings\SettingConfig;
  *
  * @package Sun\Settings\Models
  */
-class Setting extends BaseModel
+class Setting extends AbstractLocaleModel
 {
     protected $primaryKey = 'key';
     public $incrementing = false;
