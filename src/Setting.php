@@ -2,26 +2,17 @@
 
 namespace Sun\Settings;
 
-use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
+use Sun\Locale\LocaleCache;
 use Sun\Settings\SettingStorages\SettingStorage;
 
-/**
- * Class Setting
- * @package Sun\Settings
- */
 class Setting
 {
-    /**
-     * @var SettingStorage
-     */
-    protected $storage;
-    /**
-     * @var Repository
-     */
-    protected $cache;
+    protected SettingStorage $storage;
+    protected LocaleCache $cache;
 
-    public function __construct(SettingStorage $storage, Repository $cache)
+    public function __construct(SettingStorage $storage, LocaleCache $cache)
     {
         $this->storage = $storage;
         $this->cache = $cache;
@@ -32,7 +23,7 @@ class Setting
         return $this->cache->has($key);
     }
 
-    private function getFromCache(string $key): array
+    private function getFromCache(string $key)
     {
         return $this->cache->get($key);
     }
@@ -47,57 +38,43 @@ class Setting
         $this->cache->add($key, $value, config('settings.cache_time'));
     }
 
-    private function replaceInCache(string $key, $value = null)
-    {
-        if (is_null($value)) {
-            $this->deleteFromCache($key);
-        } else {
-            $this->addToCache($key, $value);
-        }
-    }
-
     private function getByKey(string $key): ?array
     {
         $cacheKey = $this->getCacheDetailKey($key);
 
         if ($this->cacheHas($cacheKey)) {
-            $setting = $this->getFromCache($cacheKey);
-        } else {
-            $setting = $this->storage->retrieve($key);
-
-            $this->addToCache($cacheKey, $setting);
+            return $this->getFromCache($cacheKey);
         }
+        $setting = $this->storage->retrieve($key);
+        $this->addToCache($cacheKey, $setting);
         return $setting;
     }
 
     private function getCacheDetailKey(string $key): string
     {
-        return "detail_{$key}";
+        return sprintf('detail_%s', $key);
     }
 
     private function getCacheListKey(): string
     {
-        return "all_settings_unique_cache_key";
+        return 'all_settings_unique_cache_key';
     }
 
-    public function get($key, $defaultValue = null)
+    public function get(string $key, $defaultValue = null)
     {
         $defaultValue = $defaultValue ?? config("settings.default_values.{$key}");
-
         $setting = $this->getWithLocale($key);
 
         return $setting['locale_value'] ?: $setting['value'] ?: $defaultValue;
     }
 
-    public function getWithLocale($key): array
+    public function getWithLocale(string $key): array
     {
-        $setting = $this->getByKey($key) ?? [
+        return $this->getByKey($key) ?? [
                 'key' => $key,
                 'value' => null,
                 'locale_value' => null,
             ];
-
-        return $setting;
     }
 
     public function setValue(string $key, $value = null)
@@ -112,7 +89,7 @@ class Setting
 
     public function set(string $key, $value = null, $locale = false)
     {
-        $setting = $this->storage->store($key, $value, $locale);
+        $this->storage->store($key, $value, $locale);
 
         $cacheKey = $this->getCacheDetailKey($key);
         $this->deleteFromCache($cacheKey);
@@ -124,15 +101,11 @@ class Setting
         $cacheKey = $this->getCacheListKey();
 
         if ($this->cacheHas($cacheKey)) {
-            $settings = $this->getFromCache($cacheKey);
-        } else {
-            $settings = $this->storage->retrieveAll();
-
-            $settings = $this->getCollectionValues($settings);
-
-            $this->addToCache($cacheKey, $settings);
+            return $this->getFromCache($cacheKey);
         }
+        $settings = $this->storage->retrieveAll();
 
+        $this->addToCache($cacheKey, $settings);
         return $settings;
     }
 
@@ -153,12 +126,20 @@ class Setting
         return $flippedKeys->merge($filteredSettings);
     }
 
-    private function getCollectionValues(Collection $items): Collection
+    public static function routes($callback = null, array $options = [])
     {
-        $defaultValues = config('settings.default_values');
+        $callback = $callback ?: function (RouteRegistrar $router) {
+            $router->all();
+        };
 
-        return $items->map(function (array $setting, $key) use ($defaultValues) {
-            return $setting['locale_value'] ?: $setting['value'] ?: $defaultValues[$key];
+        $defaultOptions = [
+            'namespace' => '\Sun\Settings\Http\Controllers',
+        ];
+
+        $options = array_merge($defaultOptions, $options);
+
+        Route::group($options, function ($router) use ($callback) {
+            $callback(new RouteRegistrar($router));
         });
     }
 }
