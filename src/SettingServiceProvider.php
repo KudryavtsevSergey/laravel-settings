@@ -9,11 +9,6 @@ use Sun\Settings\SettingStorages\EloquentSettingStorage;
 
 class SettingServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
     public function boot()
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
@@ -21,15 +16,8 @@ class SettingServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/settings.php' => config_path('settings.php')
         ], 'settings-config');
-
-        $this->loadRoutesFrom(__DIR__ . '/../routes/settings.php');
     }
 
-    /**
-     * Register services.
-     *
-     * @return void
-     */
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/settings.php', 'settings');

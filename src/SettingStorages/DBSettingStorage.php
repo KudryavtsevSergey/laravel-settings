@@ -6,15 +6,13 @@ use DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
+use stdClass;
 use Sun\Locale\LocaleConfig;
 use Sun\Settings\SettingConfig;
 
 class DBSettingStorage extends SettingStorage
 {
-    /**
-     * @var Builder
-     */
-    protected $setting;
+    protected Builder $setting;
 
     public function __construct()
     {
@@ -69,12 +67,20 @@ class DBSettingStorage extends SettingStorage
         $tableName = SettingConfig::tableName();
         $relatedTableName = SettingConfig::relatedTableName();
 
-        $settings = $this->setting->select("{$tableName}.value", "{$relatedTableName}.value as locale_value")
+        $settings = $this->setting->select("{$tableName}.key", "{$tableName}.value", "{$relatedTableName}.value as locale_value")
             ->leftJoin($relatedTableName, function (JoinClause $join) use ($tableName, $relatedTableName) {
                 $join->on("{$relatedTableName}.setting_key", '=', "{$tableName}.key")
                     ->where($relatedTableName . '.' . LocaleConfig::foreignColumnName(), '=', LocaleConfig::getLocale());
             })
             ->get();
+
+        $settings->transform(function (stdClass $setting) {
+            return [
+                'key' => $setting->key,
+                'value' => $setting->value,
+                'locale_value' => $setting->locale_value,
+            ];
+        });
 
         return $this->encodeCollection($settings);
     }

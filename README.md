@@ -2,27 +2,14 @@
 
 ## Installation
 
-cd to project.
-
-```shell script
-mkdir -p packages/sun
-
-cd packages/sun
-
-git clone https://github.com/KudryavtsevSergey/laravel-settings.git settings
-```
-
-in your composer.json
+composer.json
 
 ```json
 {
     "repositories": [
         {
-            "type": "path",
-            "url": "packages/sun/settings",
-            "options": {
-                "symlink": true
-            }
+            "type": "git",
+            "url": "https://github.com/KudryavtsevSergey/laravel-settings.git"
         }
     ],
     "require": {
@@ -34,12 +21,16 @@ in your composer.json
 After updating composer, add the service provider to the ```providers``` array in ```config/app.php```
 
 ```php
-Sun\Settings\SettingServiceProvider::class,
+[
+    Sun\Settings\SettingServiceProvider::class,
+];
 ```
 
 And add alias:
 ```php
-'Setting' => Sun\Settings\Facade::class,
+[
+    'Setting' => Sun\Settings\Facade::class,
+];
 ```
 
 Then:

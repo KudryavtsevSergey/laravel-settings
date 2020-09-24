@@ -8,16 +8,12 @@ use Sun\Locale\Models\AbstractLocaleModel;
 use Sun\Settings\SettingConfig;
 
 /**
- * Class Setting
- *
  * @property string $key
  * @property string $value
  * @property Carbon $created_at
  * @property Carbon $updated_at
  *
  * @method $this settingLocale()
- *
- * @package Sun\Settings\Models
  */
 class Setting extends AbstractLocaleModel
 {

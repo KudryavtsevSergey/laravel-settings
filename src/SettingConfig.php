@@ -6,16 +6,15 @@ use Sun\Locale\LocaleConfig;
 
 class SettingConfig
 {
-    public static function tableName()
+    public static function tableName(): string
     {
         return config('settings.table');
     }
 
-    public static function relatedTableName()
+    public static function relatedTableName(): string
     {
         $tableName = static::tableName();
         $postfix = LocaleConfig::tablePostfix();
-
-        return "{$tableName}{$postfix}";
+        return sprintf('%s%s', $tableName, $postfix);
     }
 }

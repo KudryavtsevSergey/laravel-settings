@@ -3,44 +3,37 @@
 namespace Sun\Settings\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Setting;
-use Sun\Settings\Http\Requests\SettingRequest;
 
 class SettingApiController extends Controller
 {
-    /**
-     * @param string $key
-     * @return JsonResponse
-     */
-    public function get(string $key)
+    public function get(string $key): JsonResponse
     {
         $setting = Setting::getWithLocale($key);
 
         return response()->json($setting);
     }
 
-    /**
-     * @param SettingRequest $request
-     * @param string $key
-     * @return JsonResponse
-     */
-    public function set(SettingRequest $request, string $key)
+    public function getAll(): JsonResponse
     {
-        $value = $request->input('value', null);
-
-        Setting::setValue($key, $value);
-
-        //TODO: localize
-        return response()->json(['message' => 'Setting set.']);
+        $settings = Setting::getAll();
+        return response()->json($settings);
     }
 
-    public function setLocale(SettingRequest $request, string $key)
+    public function set(Request $request, string $key): JsonResponse
     {
-        $value = $request->input('value', null);
+        $value = $request->input('value');
+        Setting::setValue($key, $value);
 
+        return $this->get($key);
+    }
+
+    public function setLocale(Request $request, string $key): JsonResponse
+    {
+        $value = $request->input('value');
         Setting::setLocaleValue($key, $value);
 
-        //TODO: localize
-        return response()->json(['message' => 'Setting locale set.']);
+        return $this->get($key);
     }
 }

@@ -8,10 +8,7 @@ use Sun\Settings\SettingConfig;
 
 class EloquentSettingStorage extends SettingStorage
 {
-    /**
-     * @var Setting
-     */
-    protected $setting;
+    protected Setting $setting;
 
     public function __construct(Setting $setting)
     {
@@ -59,6 +56,10 @@ class EloquentSettingStorage extends SettingStorage
         $settings = $this->setting->select("{$tableName}.key", "{$tableName}.value", "{$relatedTableName}.value as locale_value")
             ->settingLocale()
             ->get();
+
+        $settings->transform(function (Setting $setting) {
+            return $setting->toArray();
+        });
 
         return $this->encodeCollection($settings);
     }

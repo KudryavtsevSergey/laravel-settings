@@ -6,23 +6,10 @@ use Illuminate\Support\Collection;
 
 abstract class SettingStorage
 {
-    /**
-     * @param string $key
-     * @return array | null
-     */
     public abstract function retrieve(string $key): ?array;
 
-    /**
-     * @param string $key
-     * @param null $value
-     * @param bool $locale
-     * @return mixed
-     */
     public abstract function store(string $key, $value = null, bool $locale = false);
 
-    /**
-     * @return Collection
-     */
     public abstract function retrieveAll(): Collection;
 
     protected function encodeCollection(Collection $collection): Collection
