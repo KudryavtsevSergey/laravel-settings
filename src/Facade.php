@@ -8,8 +8,10 @@ use Illuminate\Support\Facades\Facade as IlluminateFacade;
 
 class Facade extends IlluminateFacade
 {
+    const FACADE = 'Setting';
+
     protected static function getFacadeAccessor()
     {
-        return 'Setting';
+        return self::FACADE;
     }
 }

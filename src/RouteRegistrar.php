@@ -14,7 +14,7 @@ class RouteRegistrar
         $this->router = $router;
     }
 
-    public function apiRoutes()
+    public function routes()
     {
         $this->router->group(['prefix' => 'settings', 'middleware' => ['web', 'auth']], function (Router $router) {
             $router->get('', [

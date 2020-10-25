@@ -83,7 +83,7 @@ class Setting
         $options = array_merge($defaultOptions, $options);
 
         Route::group($options, function ($router) {
-            (new RouteRegistrar($router))->apiRoutes();
+            (new RouteRegistrar($router))->routes();
         });
     }
 }
