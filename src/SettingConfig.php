@@ -17,4 +17,15 @@ class SettingConfig
         $postfix = LocaleConfig::tablePostfix();
         return sprintf('%s%s', $tableName, $postfix);
     }
+
+    public static function defaultValueByKey(string $key)
+    {
+        $settingKey = sprintf('settings.default_values.%s', $key);
+        return config($settingKey);
+    }
+
+    public static function defaultValues(): array
+    {
+        return config('settings.default_values', []);
+    }
 }

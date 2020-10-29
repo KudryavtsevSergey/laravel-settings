@@ -14,6 +14,7 @@ use Sun\Settings\SettingConfig;
  * @property Carbon $updated_at
  *
  * @method $this settingLocale()
+ * @mixin Builder
  */
 class Setting extends AbstractLocaleModel
 {

@@ -22,7 +22,7 @@ class SettingServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/settings.php', 'settings');
 
-        $this->app->singleton('Setting', Setting::class);
+        $this->app->singleton(Facade::FACADE, Setting::class);
 
         switch (config('settings.storage')) {
             case 'eloquent':

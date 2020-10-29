@@ -3,6 +3,7 @@
 namespace Sun\Settings\SettingStorages;
 
 use Illuminate\Support\Collection;
+use Sun\Settings\DTO\SettingDTO;
 use Sun\Settings\Models\Setting;
 use Sun\Settings\SettingConfig;
 
@@ -15,7 +16,7 @@ class EloquentSettingStorage extends SettingStorage
         $this->setting = $setting;
     }
 
-    public function retrieve(string $key): ?array
+    public function retrieve(string $key): ?SettingDTO
     {
         $tableName = SettingConfig::tableName();
         $relatedTableName = SettingConfig::relatedTableName();
@@ -30,13 +31,10 @@ class EloquentSettingStorage extends SettingStorage
 
         $setting = $setting->toArray();
 
-        $value = !empty($setting['value']) ? json_decode($setting['value'], true) : null;
-        $localeValue = !empty($setting['locale_value']) ? json_decode($setting['locale_value'], true) : null;
-
-        return ['value' => $value, 'locale_value' => $localeValue];
+        return SettingDTO::createFromData($setting);
     }
 
-    public function store(string $key, $value = null, bool $locale = false)
+    public function store(string $key, $value = null, bool $locale = false): void
     {
         $value = is_null($value) ? $value : json_encode($value);
 

@@ -8,6 +8,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 use stdClass;
 use Sun\Locale\LocaleConfig;
+use Sun\Settings\DTO\SettingDTO;
 use Sun\Settings\SettingConfig;
 
 class DBSettingStorage extends SettingStorage
@@ -19,7 +20,7 @@ class DBSettingStorage extends SettingStorage
         $this->setting = DB::table(SettingConfig::tableName());
     }
 
-    public function retrieve(string $key): ?array
+    public function retrieve(string $key): ?SettingDTO
     {
         $tableName = SettingConfig::tableName();
         $relatedTableName = SettingConfig::relatedTableName();
@@ -38,13 +39,10 @@ class DBSettingStorage extends SettingStorage
 
         $setting = (array)$setting;
 
-        $value = !empty($setting['value']) ? json_decode($setting['value'], true) : null;
-        $localeValue = !empty($setting['locale_value']) ? json_decode($setting['locale_value'], true) : null;
-
-        return ['value' => $value, 'locale_value' => $localeValue];
+        return SettingDTO::createFromData($setting);
     }
 
-    public function store(string $key, $value = null, bool $locale = false)
+    public function store(string $key, $value = null, bool $locale = false): void
     {
         $value = is_null($value) ? $value : json_encode($value);
 
@@ -74,7 +72,7 @@ class DBSettingStorage extends SettingStorage
             })
             ->get();
 
-        $settings->transform(function (stdClass $setting) {
+        $settings->transform(function (stdClass $setting): array {
             return [
                 'key' => $setting->key,
                 'value' => $setting->value,
